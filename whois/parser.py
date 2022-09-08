@@ -15,6 +15,7 @@ from future import standard_library
 import re
 from datetime import datetime
 import json
+# noinspection PyCompatibility
 from past.builtins import basestring
 from builtins import str
 from builtins import *
@@ -22,13 +23,16 @@ from builtins import *
 standard_library.install_aliases()
 
 try:
+    # noinspection PyUnresolvedReferences
     import dateutil.parser as dp
+    # noinspection PyUnresolvedReferences
     from .time_zones import tz_data
     DATEUTIL = True
 except ImportError:
     DATEUTIL = False
 
-EMAIL_REGEX = r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
+EMAIL_REGEX = r"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9]" \
+              r"(?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?"
 
 KNOWN_FORMATS = [
     '%d-%b-%Y',                 # 02-jan-2000
@@ -133,6 +137,7 @@ class WhoisEntry(dict):
     dayfirst = False
     yearfirst = False
 
+    # noinspection PyMissingConstructor
     def __init__(self, domain, text, regex=None):
         if 'This TLD has no whois server, but you can access the whois database at' in text:
             raise PywhoisError(text)
@@ -169,6 +174,7 @@ class WhoisEntry(dict):
 
     def _preprocess(self, attr, value):
         value = value.strip()
+        # noinspection PyCompatibility
         if value and isinstance(value, basestring) and not value.isdigit() and '_date' in attr:
             # try casting to date format
             value = cast_date(
@@ -417,12 +423,14 @@ class WhoisSG(WhoisEntry):
 
         nsmatch = re.compile('Name Servers:(.*?)DNSSEC:', re.DOTALL).search(text)
         if nsmatch:
-            self['name_servers'] = [line.strip() for line in nsmatch.groups()[0].strip().splitlines()]
+            self['name_servers'] = [line.strip() for line in
+                                    nsmatch.groups()[0].strip().splitlines()]
 
         techmatch = re.compile('Technical Contact:(.*?)Name Servers:', re.DOTALL).search(text)
         if techmatch:
             for line in techmatch.groups()[0].strip().splitlines():
-                self['technical_conatact_'+ line.split(':')[0].strip().lower()] = line.split(':')[1].strip()
+                self['technical_conatact_' +
+                     line.split(':')[0].strip().lower()] = line.split(':')[1].strip()
 
 
 class WhoisPe(WhoisEntry):
@@ -503,6 +511,7 @@ class WhoisOrg(WhoisEntry):
             WhoisEntry.__init__(self, domain, text)
 
 
+# noinspection PyDictDuplicateKeys
 class WhoisRo(WhoisEntry):
     """Whois parser for .ro domains
     """
@@ -728,6 +737,7 @@ class WhoisPl(WhoisEntry):
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
 
+
 class WhoisGroup(WhoisEntry):
     """Whois parser for .group domains
     """
@@ -750,6 +760,7 @@ class WhoisGroup(WhoisEntry):
             raise PywhoisError(text)
         else:
             WhoisEntry.__init__(self, domain, text, self.regex)
+
 
 class WhoisCa(WhoisEntry):
     """Whois parser for .ca domains
@@ -1016,6 +1027,7 @@ class WhoisEe(WhoisEntry):
             WhoisEntry.__init__(self, domain, text, self.regex)
 
 
+# noinspection PyCompatibility
 class WhoisBr(WhoisEntry):
     """Whois parser for .br domains
     """
@@ -1947,7 +1959,7 @@ class WhoisAi(WhoisEntry):
     """
     regex = {
         'domain_name':                      r'Domain Name\.*: *(.+)',
-        'domain_id' :                       r'Registry Domain ID\.*: *(.+)',
+        'domain_id':                        r'Registry Domain ID\.*: *(.+)',
         'creation_date':                    r'Creation Date: (.+)',
         'registrar':                        r'Registrar: (.+)',
         'registrar_phone':                  r'Registrar Abuse Contact Phone:(.+)',
@@ -2083,15 +2095,15 @@ class WhoisIe(WhoisEntry):
     """Whois parser for .ie domains
     """
     regex = {
-        'domain_name':      r'Domain Name: *(.+)',
-        'creation_date':    r'Creation Date: *(.+)',
-        'expiration_date':  r'Registry Expiry Date: *(.+)',
-        'name_servers':     r'Name Server: *(.+)',
-        'status':           r'Domain status: *(.+)',
-        'admin_id':         r'Registry Admin ID: *(.+)',
-        'tech_id':          r'Registry Tech ID: *(.+)',
-        'registrar':        r'Registrar: *(.+)',
-        'registrar_contact':r'Registrar Abuse Contact Email: *(.+)'
+        'domain_name':       r'Domain Name: *(.+)',
+        'creation_date':     r'Creation Date: *(.+)',
+        'expiration_date':   r'Registry Expiry Date: *(.+)',
+        'name_servers':      r'Name Server: *(.+)',
+        'status':            r'Domain status: *(.+)',
+        'admin_id':          r'Registry Admin ID: *(.+)',
+        'tech_id':           r'Registry Tech ID: *(.+)',
+        'registrar':         r'Registrar: *(.+)',
+        'registrar_contact': r'Registrar Abuse Contact Email: *(.+)'
     }
 
     def __init__(self, domain, text):
